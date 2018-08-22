@@ -10,7 +10,10 @@ import (
 
 //Info - struct for api version data
 type Info struct {
-	Version string `json:"version"`
+	Version        string `json:"version"`
+	AppID          string `json:"appID"`
+	InstanceID     string `json:"instanceID"`
+	ServerSoftware string `json:"serverSoftware"`
 }
 
 func main() {
@@ -27,7 +30,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 //infoHandler - prints api info in json
 func infoHandler(w http.ResponseWriter, r *http.Request) {
 	var info Info
-	info.Version = "0.1.0"
+	info.Version = appengine.VersionID(r.Context())
+	info.AppID = appengine.AppID(r.Context())
+	info.InstanceID = appengine.InstanceID()
+	info.ServerSoftware = appengine.ServerSoftware()
+
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(info)
 	if err != nil {
