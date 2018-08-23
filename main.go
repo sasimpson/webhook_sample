@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
 )
 
 //Info - struct for api version data
@@ -25,16 +25,20 @@ func main() {
 
 //indexHandler - displays the index
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	// ctx := appengine.NewContext(r)
+	// log.Debugf(ctx, "%#v", os.Environ())
 	fmt.Fprintf(w, "hello from the index")
 }
 
 //infoHandler - prints api info in json
 func infoHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+
 	info := Info{Version: "dev", AppID: "dev", InstanceID: "dev", ServerSoftware: "dev"}
-	log.Printf("Is dev %v", appengine.IsDevAppServer())
-	if appengine.IsDevAppServer() {
-		info.Version = appengine.VersionID(r.Context())
-		info.AppID = appengine.AppID(r.Context())
+	log.Debugf(ctx, "Is dev %v", appengine.IsDevAppServer())
+	if !appengine.IsDevAppServer() {
+		info.Version = appengine.VersionID(ctx)
+		info.AppID = appengine.AppID(ctx)
 		info.InstanceID = appengine.InstanceID()
 		info.ServerSoftware = appengine.ServerSoftware()
 	}
