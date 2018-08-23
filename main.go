@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"google.golang.org/appengine"
@@ -29,11 +30,14 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 //infoHandler - prints api info in json
 func infoHandler(w http.ResponseWriter, r *http.Request) {
-	var info Info
-	info.Version = appengine.VersionID(r.Context())
-	info.AppID = appengine.AppID(r.Context())
-	info.InstanceID = appengine.InstanceID()
-	info.ServerSoftware = appengine.ServerSoftware()
+	info := Info{Version: "dev", AppID: "dev", InstanceID: "dev", ServerSoftware: "dev"}
+	log.Printf("Is dev %v", appengine.IsDevAppServer())
+	if appengine.IsDevAppServer() {
+		info.Version = appengine.VersionID(r.Context())
+		info.AppID = appengine.AppID(r.Context())
+		info.InstanceID = appengine.InstanceID()
+		info.ServerSoftware = appengine.ServerSoftware()
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(info)
